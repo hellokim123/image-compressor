@@ -9,217 +9,332 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             padding: 20px;
         }
         
         .container {
-            max-width: 900px;
+            max-width: 950px;
             margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 30px;
+            background: linear-gradient(145deg, #1e2a4a, #16213e);
+            border-radius: 24px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5), 0 0 60px rgba(102,126,234,0.1);
+            padding: 35px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         
         h1 {
             text-align: center;
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 2em;
+            background: linear-gradient(135deg, #00d9ff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            font-size: 2.2em;
+            font-weight: 800;
         }
         
         .subtitle {
             text-align: center;
-            color: #666;
-            margin-bottom: 25px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 28px;
+            font-size: 15px;
         }
         
         /* 导航标签 */
         .tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
+            gap: 12px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
             justify-content: center;
         }
         
         .tab-btn {
-            padding: 12px 24px;
+            padding: 14px 28px;
             border: none;
-            border-radius: 25px;
-            background: #f0f0f0;
-            color: #666;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.7);
             font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.1);
         }
         
-        .tab-btn:hover { background: #e0e0e0; }
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
         
         .tab-btn.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            border: none;
+            box-shadow: 0 8px 30px rgba(102,126,234,0.4);
+            transform: translateY(-2px);
         }
         
-        .tab-content { display: none; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         
         /* 上传区域 */
         .upload-area {
-            border: 3px dashed #667eea;
-            border-radius: 15px;
-            padding: 50px 20px;
+            border: 2px dashed rgba(102,126,234,0.5);
+            border-radius: 20px;
+            padding: 60px 30px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            background: #f8f9ff;
-            margin-bottom: 20px;
+            background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
+            margin-bottom: 25px;
         }
         
-        .upload-area:hover { background: #e8ebff; border-color: #764ba2; }
+        .upload-area:hover {
+            background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.2));
+            border-color: #a855f7;
+            transform: scale(1.01);
+        }
         
-        .upload-icon { font-size: 50px; margin-bottom: 15px; }
-        .upload-text { font-size: 18px; color: #333; margin-bottom: 8px; }
-        .upload-hint { color: #999; font-size: 14px; }
+        .upload-icon { font-size: 60px; margin-bottom: 18px; animation: float 3s ease-in-out infinite; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .upload-text { font-size: 20px; color: #fff; margin-bottom: 10px; font-weight: 500; }
+        .upload-hint { color: rgba(255,255,255,0.5); font-size: 14px; }
         
         #fileInput { display: none; }
         
         /* 结果区域 */
         .result-area {
             display: none;
-            margin-top: 25px;
+            margin-top: 30px;
+            animation: fadeIn 0.4s ease;
         }
         
         .preview-container {
             display: flex;
-            gap: 20px;
+            gap: 25px;
             flex-wrap: wrap;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
         .preview-box {
             flex: 1;
-            min-width: 250px;
+            min-width: 280px;
             text-align: center;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         
         .preview-box img {
             max-width: 100%;
-            max-height: 250px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-height: 280px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
         
         .preview-label {
-            font-weight: bold;
-            margin: 12px 0 8px;
-            color: #333;
+            font-weight: 600;
+            margin: 15px 0 10px;
+            color: #00d9ff;
+            font-size: 16px;
         }
         
-        .preview-info { color: #666; font-size: 14px; }
+        .preview-info { color: rgba(255,255,255,0.6); font-size: 13px; }
         
         .stats {
             display: flex;
             justify-content: center;
-            gap: 30px;
-            margin: 20px 0;
-            padding: 20px;
-            background: #f8f9ff;
-            border-radius: 10px;
+            gap: 40px;
+            margin: 25px 0;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.2));
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         
         .stat-item { text-align: center; }
-        .stat-value { font-size: 22px; font-weight: bold; color: #667eea; }
-        .stat-label { color: #666; font-size: 13px; }
+        .stat-value { font-size: 26px; font-weight: 700; background: linear-gradient(135deg, #00d9ff, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-label { color: rgba(255,255,255,0.6); font-size: 13px; margin-top: 5px; }
         
         .download-btn {
             display: block;
-            width: 220px;
-            margin: 15px auto;
-            padding: 14px 28px;
+            width: 260px;
+            margin: 20px auto;
+            padding: 16px 32px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 25px;
-            font-size: 15px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.3s;
+            transition: all 0.3s;
             text-decoration: none;
+            box-shadow: 0 8px 30px rgba(102,126,234,0.4);
         }
         
-        .download-btn:hover { transform: scale(1.05); }
+        .download-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(102,126,234,0.5);
+        }
         
         /* 选项控件 */
         .options {
-            background: #f8f9ff;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            background: linear-gradient(135deg, rgba(102,126,234,0.15), rgba(118,75,162,0.15));
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         
         .option-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
         }
         
-        .option-row label { color: #333; font-weight: 500; }
+        .option-row:last-child { margin-bottom: 0; }
+        
+        .option-row label { color: #fff; font-weight: 500; font-size: 15px; }
         
         select, input[type="range"] {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 10px 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
             font-size: 14px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            outline: none;
+            transition: all 0.3s;
         }
         
-        select { min-width: 150px; }
+        select:hover, select:focus { border-color: #667eea; background: rgba(255,255,255,0.15); }
         
-        input[type="range"] { width: 200px; }
+        select option { background: #1e2a4a; color: #fff; }
+        
+        input[type="range"] {
+            width: 180px;
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.2);
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.5);
+        }
+        
+        input[type="number"] {
+            padding: 10px 14px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            width: 90px;
+        }
+        
+        input[type="number"]::placeholder { color: rgba(255,255,255,0.4); }
+        
+        .action-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102,126,234,0.4); }
+        
+        .action-btn.green { background: linear-gradient(135deg, #11998e, #38ef7d); }
         
         .tips {
             text-align: center;
-            color: #999;
-            font-size: 12px;
-            margin-top: 25px;
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+            margin-top: 30px;
         }
         
         /* 批量处理 */
         .file-list {
             margin-top: 20px;
-            text-align: left;
         }
         
         .file-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px;
-            background: #f8f9ff;
-            border-radius: 8px;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
             margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
         
-        .file-item span { color: #333; }
+        .file-item span { color: #fff; }
+        .file-item .size { color: rgba(255,255,255,0.5); font-size: 13px; }
         
-        .file-item .size { color: #999; font-size: 13px; }
+        /* 功能介绍 */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .feature {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+        }
+        
+        .feature-icon { font-size: 28px; margin-bottom: 8px; }
+        .feature-title { color: #fff; font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+        .feature-desc { color: rgba(255,255,255,0.5); font-size: 12px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🖼️ 图片工具箱</h1>
-        <p class="subtitle">免费在线图片处理工具</p>
+        <p class="subtitle">免费在线图片处理 · 无需安装 · 保护隐私</p>
         
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('compress')">图片压缩</button>
-            <button class="tab-btn" onclick="switchTab('convert')">格式转换</button>
-            <button class="tab-btn" onclick="switchTab('resize')">图片缩放</button>
-            <button class="tab-btn" onclick="switchTab('batch')">批量处理</button>
+            <button class="tab-btn active" onclick="switchTab('compress', event)">🖼️ 图片压缩</button>
+            <button class="tab-btn" onclick="switchTab('convert', event)">🔄 格式转换</button>
+            <button class="tab-btn" onclick="switchTab('resize', event)">📐 图片缩放</button>
+            <button class="tab-btn" onclick="switchTab('batch', event)">📚 批量处理</button>
         </div>
         
         <!-- 图片压缩 -->
@@ -234,18 +349,18 @@
             <div class="result-area" id="compressResult">
                 <div class="options">
                     <div class="option-row">
-                        <label>压缩质量: <span id="qualityValue">80</span>%</label>
+                        <label>压缩质量: <span id="qualityValue" style="color:#00d9ff;font-weight:700">80</span>%</label>
                         <input type="range" id="qualitySlider" min="10" max="100" value="80" oninput="updateQuality(this.value)">
                     </div>
                 </div>
                 <div class="preview-container">
                     <div class="preview-box">
-                        <div class="preview-label">原图</div>
+                        <div class="preview-label">📷 原图</div>
                         <img id="originalImg" src="" alt="原图">
                         <div class="preview-info" id="originalInfo"></div>
                     </div>
                     <div class="preview-box">
-                        <div class="preview-label">处理后</div>
+                        <div class="preview-label">✨ 处理后</div>
                         <img id="compressedImg" src="" alt="处理后">
                         <div class="preview-info" id="compressedInfo"></div>
                     </div>
@@ -261,10 +376,10 @@
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="savedPercent">-</div>
-                        <div class="stat-label">节省</div>
+                        <div class="stat-label">节省空间</div>
                     </div>
                 </div>
-                <a class="download-btn" id="downloadBtn" download="processed-image.png">下载处理后的图片</a>
+                <a class="download-btn" id="downloadBtn" download="processed-image.png">⬇️ 下载处理后的图片</a>
             </div>
         </div>
         
@@ -282,23 +397,23 @@
                     <div class="option-row">
                         <label>转换为:</label>
                         <select id="formatSelect" onchange="convertImage()">
-                            <option value="image/jpeg">JPG</option>
-                            <option value="image/png">PNG</option>
-                            <option value="image/webp">WebP</option>
+                            <option value="image/jpeg">JPG 格式</option>
+                            <option value="image/png">PNG 格式</option>
+                            <option value="image/webp">WebP 格式</option>
                         </select>
                     </div>
                 </div>
                 <div class="preview-container">
                     <div class="preview-box">
-                        <div class="preview-label">原图</div>
+                        <div class="preview-label">📷 原图</div>
                         <img id="convertOriginal" src="" alt="原图">
                     </div>
                     <div class="preview-box">
-                        <div class="preview-label">转换后</div>
+                        <div class="preview-label">🔄 转换后</div>
                         <img id="convertResultImg" src="" alt="转换后">
                     </div>
                 </div>
-                <a class="download-btn" id="convertDownload" download="converted-image.png">下载转换后的图片</a>
+                <a class="download-btn" id="convertDownload" download="converted-image.png">⬇️ 下载转换后的图片</a>
             </div>
         </div>
         
@@ -323,26 +438,26 @@
                         </select>
                     </div>
                     <div class="option-row" id="percentOption">
-                        <label>缩放比例: <span id="percentValue">50</span>%</label>
+                        <label>缩放比例: <span id="percentValue" style="color:#00d9ff;font-weight:700">50</span>%</label>
                         <input type="range" id="percentSlider" min="10" max="200" value="50" oninput="updatePercent(this.value)">
                     </div>
                     <div class="option-row" id="sizeOption" style="display:none">
-                        <input type="number" id="resizeWidth" placeholder="宽度" style="width:80px"> x 
-                        <input type="number" id="resizeHeight" placeholder="高度" style="width:80px">
-                        <button onclick="resizeImage()" style="padding:8px 16px;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer">确定</button>
+                        <input type="number" id="resizeWidth" placeholder="宽度"> × 
+                        <input type="number" id="resizeHeight" placeholder="高度">
+                        <button class="action-btn" onclick="resizeImage()">确定</button>
                     </div>
                 </div>
                 <div class="preview-container">
                     <div class="preview-box">
-                        <div class="preview-label">原图</div>
+                        <div class="preview-label">📷 原图</div>
                         <img id="resizeOriginal" src="">
                     </div>
                     <div class="preview-box">
-                        <div class="preview-label">缩放后</div>
+                        <div class="preview-label">📏 缩放后</div>
                         <img id="resizeResultImg" src="">
                     </div>
                 </div>
-                <a class="download-btn" id="resizeDownload" download="resized-image.png">下载缩放后的图片</a>
+                <a class="download-btn" id="resizeDownload" download="resized-image.png">⬇️ 下载缩放后的图片</a>
             </div>
         </div>
         
@@ -358,19 +473,42 @@
             <div class="result-area" id="batchResult">
                 <div class="options">
                     <div class="option-row">
-                        <label>批量压缩质量: <span id="batchQuality">80</span>%</label>
+                        <label>批量压缩质量: <span id="batchQuality" style="color:#00d9ff;font-weight:700">80</span>%</label>
                         <input type="range" id="batchQualitySlider" min="10" max="100" value="80" oninput="document.getElementById('batchQuality').textContent=this.value">
                     </div>
-                    <div class="option-row">
-                        <button onclick="processBatch()" style="padding:10px 20px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:20px;cursor:pointer">开始批量处理</button>
-                        <button onclick="downloadBatch()" style="padding:10px 20px;background:#4CAF50;color:white;border:none;border-radius:20px;cursor:pointer">全部下载</button>
+                    <div class="option-row" style="justify-content:center;gap:15px">
+                        <button class="action-btn" onclick="processBatch()">🚀 开始批量处理</button>
+                        <button class="action-btn green" onclick="downloadBatch()">⬇️ 全部下载</button>
                     </div>
                 </div>
                 <div class="file-list" id="fileList"></div>
             </div>
         </div>
         
-        <p class="tips">🔒 所有处理在浏览器本地完成，不会上传服务器，保护隐私</p>
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">本地处理</div>
+                <div class="feature-desc">浏览器端处理，保护隐私</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">多功能</div>
+                <div class="feature-desc">压缩/转换/缩放/批量</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📱</div>
+                <div class="feature-title">响应式</div>
+                <div class="feature-desc">电脑手机都能用</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🆓</div>
+                <div class="feature-title">完全免费</div>
+                <div class="feature-desc">无需注册无需付费</div>
+            </div>
+        </div>
+        
+        <p class="tips">🔒 所有处理在浏览器本地完成，不会上传服务器，保护您的隐私</p>
     </div>
 
     <script>
@@ -378,11 +516,11 @@
         let currentImg = null;
         let batchFiles = [];
         
-        function switchTab(tabId) {
+        function switchTab(tabId, event) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
+            if(event && event.target) event.target.classList.add('active');
         }
         
         function handleFile(file, type) {
@@ -431,7 +569,7 @@
             document.getElementById('compressedSize').textContent = formatSize(size);
             
             const saved = ((currentFile.size - size) / currentFile.size * 100).toFixed(1);
-            document.getElementById('savedPercent').textContent = saved > 0 ? '-' + saved + '%' : '+0%';
+            document.getElementById('savedPercent').textContent = saved > 0 ? '-' + saved + '%' : '0%';
             
             document.getElementById('downloadBtn').href = dataUrl;
             document.getElementById('downloadBtn').download = 'compressed-' + currentFile.name;
@@ -465,6 +603,8 @@
         function showResize(img, file) {
             document.getElementById('resizeResult').style.display = 'block';
             document.getElementById('resizeOriginal').src = img.src;
+            document.getElementById('resizeWidth').value = img.width;
+            document.getElementById('resizeHeight').value = img.height;
             resizeImage();
         }
         
@@ -525,7 +665,6 @@
         
         async function processBatch() {
             const quality = document.getElementById('batchQualitySlider').value / 100;
-            const list = document.getElementById('fileList');
             
             for (let i = 0; i < batchFiles.length; i++) {
                 const file = batchFiles[i];
@@ -548,7 +687,7 @@
                     reader.readAsDataURL(file);
                 });
             }
-            alert('批量处理完成！点击"全部下载"');
+            alert('✅ 批量处理完成！点击"全部下载"');
         }
         
         function downloadBatch() {
