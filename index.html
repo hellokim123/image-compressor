@@ -5,289 +5,388 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>图片工具箱 - 免费在线图片处理</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
+        :root { --primary: #00f5d4; --secondary: #9b5de5; --accent: #f15bb5; --danger: #ff006e; --info: #00bbf9; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans SC', sans-serif; background: #050508; min-height: 100vh; padding: 20px; overflow-x: hidden; }
         
-        body {
-            font-family: 'Noto Sans SC', sans-serif;
-            background: #0a0a0f;
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
-        }
+        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+        .hero-bg::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 15% 15%, rgba(0,245,212,0.12) 0%, transparent 50%), radial-gradient(ellipse at 85% 25%, rgba(155,93,229,0.12) 0%, transparent 50%), radial-gradient(ellipse at 75% 75%, rgba(241,91,181,0.1) 0%, transparent 50%), radial-gradient(ellipse at 25% 85%, rgba(255,0,110,0.08) 0%, transparent 50%), linear-gradient(180deg, #050508 0%, #0a0a12 100%); }
+        .grid-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 60px 60px; animation: gridMove 20s linear infinite; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); animation: orbFloat 20s ease-in-out infinite; }
+        .orb-1 { width: 500px; height: 500px; background: rgba(0,245,212,0.15); top: -10%; left: -10%; }
+        .orb-2 { width: 400px; height: 400px; background: rgba(155,93,229,0.15); top: 50%; right: -10%; animation-delay: -7s; }
+        .orb-3 { width: 350px; height: 350px; background: rgba(241,91,181,0.12); bottom: -10%; left: 30%; animation-delay: -14s; }
         
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
+        .container { max-width: 1100px; margin: 0 auto; position: relative; }
+        .header { text-align: center; padding: 50px 0 40px; }
+        .logo-wrapper { display: inline-block; position: relative; margin-bottom: 20px; }
+        .logo-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120px; height: 120px; background: radial-gradient(circle, rgba(0,245,212,0.4) 0%, transparent 70%); animation: glowPulse 2s ease-in-out infinite; }
+        .logo { font-size: 80px; position: relative; z-index: 1; animation: logoBounce 3s ease-in-out infinite; display: inline-block; }
         
-        .bg-animation::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: 
-                radial-gradient(ellipse at 20% 20%, rgba(120, 0, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(0, 255, 200, 0.1) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(255, 0, 100, 0.08) 0%, transparent 40%);
-            animation: bgMove 20s ease-in-out infinite;
-        }
+        h1 { font-size: 52px; font-weight: 900; margin-bottom: 15px; letter-spacing: 4px; position: relative; display: inline-block; }
+        h1::before, h1::after { content: ''; position: absolute; top: 50%; width: 80px; height: 2px; background: linear-gradient(90deg, transparent, var(--primary), transparent); }
+        h1::before { right: 100%; margin-right: 20px; }
+        h1::after { left: 100%; margin-left: 20px; }
         
-        @keyframes bgMove {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(2%, 2%) rotate(1deg); }
-            66% { transform: translate(-1%, 1%) rotate(-1deg); }
-        }
+        .title-text { background: linear-gradient(135deg, #fff 0%, #00f5d4 25%, #9b5de5 50%, #f15bb5 75%, #fff 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: titleShine 4s linear infinite; }
+        .header p { color: rgba(255,255,255,0.5); font-size: 18px; letter-spacing: 6px; text-transform: uppercase; }
+        .badge { display: inline-block; padding: 8px 20px; background: linear-gradient(135deg, rgba(0,245,212,0.2), rgba(155,93,229,0.2)); border: 1px solid rgba(0,245,212,0.3); border-radius: 30px; color: #00f5d4; font-size: 13px; margin-top: 20px; }
         
-        .floating-shapes { position: absolute; width: 100%; height: 100%; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 35px; flex-wrap: wrap; justify-content: center; padding: 0 10px; }
+        .tab-btn { padding: 12px 18px; border: none; border-radius: 14px; background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.6); font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.5s; border: 1px solid rgba(255,255,255,0.08); }
+        .tab-btn:hover { transform: translateY(-3px); color: #fff; }
+        .tab-btn.active { color: #000; transform: translateY(-3px); }
+        .tab-btn:nth-child(1).active { background: linear-gradient(135deg, #00f5d4, #00bbf9); }
+        .tab-btn:nth-child(2).active { background: linear-gradient(135deg, #9b5de5, #f15bb5); }
+        .tab-btn:nth-child(3).active { background: linear-gradient(135deg, #f15bb5, #ff006e); }
+        .tab-btn:nth-child(4).active { background: linear-gradient(135deg, #00f5a0, #00d397); }
+        .tab-btn:nth-child(5).active { background: linear-gradient(135deg, #f7931e, #ff6b6b); }
+        .tab-btn:nth-child(6).active { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .tab-btn:nth-child(7).active { background: linear-gradient(135deg, #ff6b6b, #f7931e); }
         
-        .shape {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.4;
-            animation: float 15s ease-in-out infinite;
-        }
-        
-        .shape:nth-child(1) { width: 400px; height: 400px; background: linear-gradient(135deg, #ff006e, #ff1744); top: 10%; left: 10%; animation-delay: 0s; }
-        .shape:nth-child(2) { width: 300px; height: 300px; background: linear-gradient(135deg, #00f5d4, #00bbf9); top: 60%; right: 10%; animation-delay: -5s; }
-        .shape:nth-child(3) { width: 250px; height: 250px; background: linear-gradient(135deg, #9b5de5, #f15bb5); bottom: 20%; left: 30%; animation-delay: -10s; }
-        
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(30px, -30px) scale(1.1); }
-        }
-        
-        .container { max-width: 1000px; margin: 0 auto; position: relative; }
-        
-        .hero { text-align: center; padding: 40px 0 50px; }
-        
-        .logo { font-size: 70px; margin-bottom: 15px; animation: bounce 2s ease-in-out infinite; display: inline-block; }
-        
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        
-        h1 { font-size: 42px; font-weight: 900; margin-bottom: 12px; background: linear-gradient(135deg, #fff 0%, #a8a8a8 50%, #fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: 2px; }
-        
-        .hero p { color: rgba(255,255,255,0.5); font-size: 16px; letter-spacing: 3px; }
-        
-        .gradient-text { background: linear-gradient(135deg, #00f5d4, #00bbf9, #9b5de5, #f15bb5, #ff006e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; background-size: 300% 300%; animation: gradientShift 5s ease infinite; }
-        
-        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        
-        .tabs { display: flex; gap: 15px; margin-bottom: 35px; flex-wrap: wrap; justify-content: center; }
-        
-        .tab-btn { padding: 16px 32px; border: none; border-radius: 50px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.4s; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); position: relative; overflow: hidden; }
-        
-        .tab-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
-        
-        .tab-btn:hover::before { left: 100%; }
-        .tab-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
-        
-        .tab-btn.active { background: linear-gradient(135deg, #00f5d4, #00bbf9); color: #000; border: none; box-shadow: 0 10px 40px rgba(0,212, 245, .4); transform: translateY(-3px); }
-        .tab-btn.active:nth-child(2) { background: linear-gradient(135deg, #9b5de5, #f15bb5); }
-        .tab-btn.active:nth-child(3) { background: linear-gradient(135deg, #f15bb5, #ff006e); }
-        .tab-btn.active:nth-child(4) { background: linear-gradient(135deg, #ff006e, #ff1744); }
-        
-        .tab-content { display: none; animation: fadeIn 0.5s ease; }
+        .tab-content { display: none; animation: fadeIn 0.6s ease; }
         .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .upload-area { border: 2px dashed rgba(255,255,255,0.15); border-radius: 28px; padding: 70px 35px; text-align: center; cursor: pointer; transition: all 0.5s; background: rgba(255,255,255,0.02); margin-bottom: 28px; }
+        .upload-area:hover { border-color: var(--primary); transform: scale(1.01); }
+        .upload-icon { font-size: 70px; margin-bottom: 18px; animation: iconFloat 3s ease-in-out infinite; display: inline-block; }
+        .upload-text { font-size: 22px; color: #fff; margin-bottom: 10px; font-weight: 800; }
+        .upload-hint { color: rgba(255,255,255,0.4); font-size: 13px; }
+        #fileInput, #fileInput2, #fileInput3, #fileInput4, #watermarkInput, #fileInput5, #pdfInput { display: none; }
         
-        .upload-area { border: 2px dashed rgba(255,255,255,0.2); border-radius: 30px; padding: 80px 40px; text-align: center; cursor: pointer; transition: all 0.4s; background: rgba(255,255,255,0.03); margin-bottom: 30px; position: relative; overflow: hidden; }
+        .result-area { display: none; margin-top: 30px; animation: fadeIn 0.6s ease; background: rgba(255,255,255,0.03); border-radius: 24px; padding: 28px; border: 1px solid rgba(255,255,255,0.08); }
+        .options { background: rgba(0,0,0,0.3); padding: 22px; border-radius: 16px; margin-bottom: 22px; }
+        .option-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .option-row label { color: #fff; font-weight: 600; font-size: 14px; }
         
-        .upload-area::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(0,245,212,0.1), rgba(155,93,229,0.1)); opacity: 0; transition: opacity 0.4s; }
-        
-        .upload-area:hover::before { opacity: 1; }
-        .upload-area:hover { border-color: #00f5d4; transform: scale(1.01); box-shadow: 0 20px 60px rgba(0,245,212,0.2); }
-        
-        .upload-icon { font-size: 80px; margin-bottom: 20px; animation: pulse 2s ease-in-out infinite; display: inline-block; }
-        
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        
-        .upload-text { font-size: 24px; color: #fff; margin-bottom: 12px; font-weight: 700; }
-        .upload-hint { color: rgba(255,255,255,0.4); font-size: 14px; }
-        #fileInput { display: none; }
-        
-        .result-area { display: none; margin-top: 35px; animation: fadeIn 0.5s ease; }
-        
-        .preview-container { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px; }
-        
-        .preview-box { flex: 1; min-width: 300px; text-align: center; background: rgba(255,255,255,0.05); border-radius: 24px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); transition: all 0.3s; }
-        .preview-box:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-        .preview-box img { max-width: 100%; max-height: 300px; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); }
-        .preview-label { font-weight: 700; margin: 18px 0 12px; font-size: 18px; }
-        .preview-label:nth-child(1) { color: #00f5d4; }
-        .preview-info { color: rgba(255,255,255,0.5); font-size: 13px; }
-        
-        .stats { display: flex; justify-content: center; gap: 50px; margin: 30px 0; padding: 30px; background: rgba(255,255,255,0.05); border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); }
-        .stat-item { text-align: center; }
-        .stat-value { font-size: 32px; font-weight: 900; background: linear-gradient(135deg, #00f5d4, #9b5de5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .stat-label { color: rgba(255,255,255,0.5); font-size: 13px; margin-top: 8px; text-transform: uppercase; letter-spacing: 2px; }
-        
-        .download-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 300px; margin: 25px auto; padding: 18px 36px; background: linear-gradient(135deg, #00f5d4, #00bbf9); color: #000; border: none; border-radius: 50px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.4s; text-decoration: none; box-shadow: 0 10px 40px rgba(0, 245, 212, 0.3); }
-        .download-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 20px 50px rgba(0, 245, 212, 0.5); }
-        
-        .options { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 24px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.1); }
-        .option-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-        .option-row:last-child { margin-bottom: 0; }
-        .option-row label { color: #fff; font-weight: 600; font-size: 16px; }
-        
-        select, input[type="range"] { padding: 12px 18px; border: 1px solid rgba(255,255,255,0.2); border-radius: 14px; font-size: 14px; background: rgba(255,255,255,0.1); color: #fff; outline: none; transition: all 0.3s; }
-        select:hover, select:focus { border-color: #00f5d4; background: rgba(255,255,255,0.15); }
+        select, input[type="range"], input[type="text"], input[type="number"] { padding: 10px 14px; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; font-size: 13px; background: rgba(255,255,255,0.08); color: #fff; outline: none; }
         select option { background: #1a1a2e; }
+        input[type="range"] { width: 160px; -webkit-appearance: none; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.15); }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--info)); }
         
-        input[type="range"] { width: 200px; -webkit-appearance: none; height: 10px; border-radius: 5px; background: rgba(255,255,255,0.2); }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, #00f5d4, #00bbf9); cursor: pointer; box-shadow: 0 4px 20px rgba(0,245,212,0.5); }
+        .action-btn { padding: 12px 24px; background: linear-gradient(135deg, var(--primary), var(--info)); color: #000; border: none; border-radius: 50px; font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.3s; }
+        .action-btn:hover { transform: translateY(-2px); }
+        .action-btn.orange { background: linear-gradient(135deg, #f7931e, #ff6b6b); }
         
-        input[type="number"] { padding: 12px 16px; border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; font-size: 14px; background: rgba(255,255,255,0.1); color: #fff; width: 100px; }
+        .preview-container { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; margin-bottom: 25px; }
+        .preview-box { flex: 1; min-width: 260px; text-align: center; background: rgba(0,0,0,0.3); border-radius: 18px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .preview-box img, .preview-box canvas { max-width: 100%; max-height: 250px; border-radius: 12px; }
+        .preview-label { font-weight: 800; margin: 14px 0 10px; font-size: 16px; }
         
-        .action-btn { padding: 14px 28px; background: linear-gradient(135deg, #00f5d4, #00bbf9); color: #000; border: none; border-radius: 50px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s; }
-        .action-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,245,212,0.4); }
-        .action-btn.green { background: linear-gradient(135deg, #00f5a0, #00d397); }
+        .stats { display: flex; justify-content: center; gap: 40px; margin: 25px 0; padding: 25px; background: linear-gradient(135deg, rgba(0,245,212,0.1), rgba(155,93,229,0.1)); border-radius: 18px; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 900; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-label { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 6px; }
         
-        .file-list { margin-top: 25px; }
-        .file-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: rgba(255,255,255,0.08); border-radius: 14px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s; }
-        .file-item:hover { background: rgba(255,255,255,0.12); transform: translateX(5px); }
-        .file-item span { color: #fff; }
-        .file-item .size { color: rgba(255,255,255,0.5); }
+        .download-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 260px; margin: 22px auto; padding: 16px 30px; background: linear-gradient(135deg, var(--primary), var(--info)); color: #000; border: none; border-radius: 50px; font-size: 15px; font-weight: 800; cursor: pointer; text-decoration: none; }
         
-        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 50px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .feature { text-align: center; padding: 25px 20px; background: rgba(255,255,255,0.03); border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); transition: all 0.3s; }
-        .feature:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
-        .feature-icon { font-size: 40px; margin-bottom: 15px; }
-        .feature-title { color: #fff; font-weight: 700; font-size: 16px; margin-bottom: 8px; }
-        .feature-desc { color: rgba(255,255,255,0.4); font-size: 13px; }
+        .file-list { margin-top: 20px; }
+        .file-item { display: flex; justify-content: space-between; padding: 14px 18px; background: rgba(0,0,0,0.3); border-radius: 12px; margin-bottom: 10px; }
+        .file-item span { color: #fff; font-size: 13px; }
         
-        .tips { text-align: center; color: rgba(255,255,255,0.3); font-size: 13px; margin-top: 40px; }
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .feature { text-align: center; padding: 20px 15px; background: rgba(255,255,255,0.02); border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); }
+        .feature-icon { font-size: 36px; margin-bottom: 10px; }
+        .feature-title { color: #fff; font-weight: 800; font-size: 14px; margin-bottom: 6px; }
+        .feature-desc { color: rgba(255,255,255,0.4); font-size: 11px; }
+        .tips { text-align: center; color: rgba(255,255,255,0.25); font-size: 12px; margin-top: 30px; }
     </style>
 </head>
 <body>
-    <div class="bg-animation">
-        <div class="floating-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+    <div class="hero-bg">
+        <div class="grid-lines"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
     </div>
     <div class="container">
-        <div class="hero">
-            <div class="logo">🖼️</div>
-            <h1>图片<span class="gradient-text">工具箱</span></h1>
-            <p>免费在线图片处理 · 无需下载 · 保护隐私</p>
-        </div>
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('compress', event)">🗜️ 图片压缩</button>
-            <button class="tab-btn" onclick="switchTab('convert', event)">🔄 格式转换</button>
-            <button class="tab-btn" onclick="switchTab('resize', event)">📐 图片缩放</button>
-            <button class="tab-btn" onclick="switchTab('batch', event)">📚 批量处理</button>
+        <div class="header">
+            <div class="logo-wrapper"><div class="logo-glow"></div><div class="logo">🖼️</div></div>
+            <h1><span class="title-text">图片工具箱</span></h1>
+            <p>免费在线图片处理 · 无需下载</p>
+            <div class="badge">✨ 7大功能 · 完全免费</div>
         </div>
         
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('compress', event)">🗜️ 压缩</button>
+            <button class="tab-btn" onclick="switchTab('convert', event)">🔄 转换</button>
+            <button class="tab-btn" onclick="switchTab('resize', event)">📐 缩放</button>
+            <button class="tab-btn" onclick="switchTab('crop', event)">✂️ 裁剪</button>
+            <button class="tab-btn" onclick="switchTab('watermark', event)">💧 水印</button>
+            <button class="tab-btn" onclick="switchTab('rotate', event)">🔃 旋转</button>
+            <button class="tab-btn" onclick="switchTab('pdf', event)">📑 转PDF</button>
+        </div>
+        
+        <!-- 压缩 -->
         <div id="compress" class="tab-content active">
             <div class="upload-area" onclick="document.getElementById('fileInput').click()">
                 <div class="upload-icon">📁</div>
-                <div class="upload-text">拖拽图片到这里，或点击选择</div>
-                <div class="upload-hint">支持 JPG、PNG、WebP，单个最大 10MB</div>
+                <div class="upload-text">图片压缩</div>
+                <div class="upload-hint">支持 JPG、PNG、WebP</div>
             </div>
             <input type="file" id="fileInput" accept="image/*" onchange="handleFile(this.files[0], 'compress')">
             <div class="result-area" id="compressResult">
-                <div class="options">
-                    <div class="option-row"><label>压缩质量: <span id="qualityValue" style="color:#00f5d4;font-weight:700;font-size:20px">80</span>%</label><input type="range" id="qualitySlider" min="10" max="100" value="80" oninput="updateQuality(this.value)"></div>
-                </div>
-                <div class="preview-container">
-                    <div class="preview-box"><div class="preview-label">📷 原图</div><img id="originalImg" src="" alt="原图"><div class="preview-info" id="originalInfo"></div></div>
-                    <div class="preview-box"><div class="preview-label">✨ 处理后</div><img id="compressedImg" src="" alt="处理后"><div class="preview-info" id="compressedInfo"></div></div>
-                </div>
-                <div class="stats">
-                    <div class="stat-item"><div class="stat-value" id="originalSize">-</div><div class="stat-label">原图大小</div></div>
-                    <div class="stat-item"><div class="stat-value" id="compressedSize">-</div><div class="stat-label">处理后</div></div>
-                    <div class="stat-item"><div class="stat-value" id="savedPercent">-</div><div class="stat-label">节省空间</div></div>
-                </div>
-                <a class="download-btn" id="downloadBtn" download="processed-image.png"><span>⬇️</span> 下载处理后的图片</a>
+                <div class="options"><div class="option-row"><label>质量: <span id="qualityValue" style="color:#00f5d4;font-weight:800">80</span>%</label><input type="range" id="qualitySlider" min="10" max="100" value="80" oninput="updateQuality(this.value)"></div></div>
+                <div class="preview-container"><div class="preview-box"><div class="preview-label">📷 原图</div><img id="originalImg" src=""></div><div class="preview-box"><div class="preview-label">✨ 压缩后</div><img id="compressedImg" src=""></div></div>
+                <div class="stats"><div class="stat-item"><div class="stat-value" id="originalSize">-</div><div class="stat-label">原图</div></div><div class="stat-item"><div class="stat-value" id="compressedSize">-</div><div class="stat-label">压缩后</div></div><div class="stat-item"><div class="stat-value" id="savedPercent">-</div><div class="stat-label">节省</div></div></div>
+                <a class="download-btn" id="downloadBtn" download="image.png"><span>⬇️</span> 下载</a>
             </div>
         </div>
         
+        <!-- 转换 -->
         <div id="convert" class="tab-content">
             <div class="upload-area" onclick="document.getElementById('fileInput2').click()">
                 <div class="upload-icon">🔄</div>
-                <div class="upload-text">选择图片进行格式转换</div>
-                <div class="upload-hint">支持 JPG、PNG、WebP 互转</div>
+                <div class="upload-text">格式转换</div>
+                <div class="upload-hint">JPG/PNG/WebP 互转</div>
             </div>
             <input type="file" id="fileInput2" accept="image/*" onchange="handleFile(this.files[0], 'convert')">
             <div class="result-area" id="convertResult">
-                <div class="options"><div class="option-row"><label>转换为:</label><select id="formatSelect" onchange="convertImage()"><option value="image/jpeg">JPG 格式</option><option value="image/png">PNG 格式</option><option value="image/webp">WebP 格式</option></select></div></div>
-                <div class="preview-container">
-                    <div class="preview-box"><div class="preview-label">📷 原图</div><img id="convertOriginal" src="" alt="原图"></div>
-                    <div class="preview-box"><div class="preview-label">🔄 转换后</div><img id="convertResultImg" src="" alt="转换后"></div>
-                </div>
-                <a class="download-btn" id="convertDownload" download="converted-image.png"><span>⬇️</span> 下载转换后的图片</a>
+                <div class="options"><div class="option-row"><label>转换为:</label><select id="formatSelect" onchange="convertImage()"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option><option value="image/webp">WebP</option></select></div></div>
+                <div class="preview-container"><div class="preview-box"><div class="preview-label">📷 原图</div><img id="convertOriginal" src=""></div><div class="preview-box"><div class="preview-label">🔄 转换后</div><img id="convertResultImg" src=""></div></div>
+                <a class="download-btn" id="convertDownload" download="converted.png"><span>⬇️</span> 下载</a>
             </div>
         </div>
         
+        <!-- 缩放 -->
         <div id="resize" class="tab-content">
             <div class="upload-area" onclick="document.getElementById('fileInput3').click()">
                 <div class="upload-icon">📐</div>
-                <div class="upload-text">选择图片进行缩放</div>
-                <div class="upload-hint">支持自定义尺寸和比例</div>
+                <div class="upload-text">图片缩放</div>
+                <div class="upload-hint">按比例或自定义尺寸</div>
             </div>
             <input type="file" id="fileInput3" accept="image/*" onchange="handleFile(this.files[0], 'resize')">
             <div class="result-area" id="resizeResult">
                 <div class="options">
-                    <div class="option-row"><label>缩放方式:</label><select id="resizeMode" onchange="resizeImage()"><option value="percent">按比例缩放</option><option value="width">固定宽度</option><option value="height">固定高度</option><option value="custom">自定义尺寸</option></select></div>
-                    <div class="option-row" id="percentOption"><label>缩放比例: <span id="percentValue" style="color:#00f5d4;font-weight:700;font-size:20px">50</span>%</label><input type="range" id="percentSlider" min="10" max="200" value="50" oninput="updatePercent(this.value)"></div>
-                    <div class="option-row" id="sizeOption" style="display:none"><input type="number" id="resizeWidth" placeholder="宽度"> × <input type="number" id="resizeHeight" placeholder="高度"><button class="action-btn" onclick="resizeImage()">确定</button></div>
+                    <div class="option-row"><label>方式:</label><select id="resizeMode" onchange="resizeImage()"><option value="percent">按比例</option><option value="width">固定宽度</option><option value="height">固定高度</option></select></div>
+                    <div class="option-row" id="percentOption"><label>比例: <span id="percentValue" style="color:#00f5d4;font-weight:800">50</span>%</label><input type="range" id="percentSlider" min="10" max="200" value="50" oninput="updatePercent(this.value)"></div>
+                    <div class="option-row" id="sizeOption" style="display:none"><input type="number" id="resizeWidth" placeholder="宽"> × <input type="number" id="resizeHeight" placeholder="高"><button class="action-btn" onclick="resizeImage()">确定</button></div>
                 </div>
-                <div class="preview-container">
-                    <div class="preview-box"><div class="preview-label">📷 原图</div><img id="resizeOriginal" src=""></div>
-                    <div class="preview-box"><div class="preview-label">📏 缩放后</div><img id="resizeResultImg" src=""></div>
-                </div>
-                <a class="download-btn" id="resizeDownload" download="resized-image.png"><span>⬇️</span> 下载缩放后的图片</a>
+                <div class="preview-container"><div class="preview-box"><div class="preview-label">📷 原图</div><img id="resizeOriginal" src=""></div><div class="preview-box"><div class="preview-label">📏 缩放后</div><img id="resizeResultImg" src=""></div></div>
+                <a class="download-btn" id="resizeDownload" download="resized.png"><span>⬇️</span> 下载</a>
             </div>
         </div>
         
-        <div id="batch" class="tab-content">
+        <!-- 裁剪 -->
+        <div id="crop" class="tab-content">
             <div class="upload-area" onclick="document.getElementById('fileInput4').click()">
-                <div class="upload-icon">📚</div>
-                <div class="upload-text">选择多张图片进行批量处理</div>
-                <div class="upload-hint">一次最多处理 20 张图片</div>
+                <div class="upload-icon">✂️</div>
+                <div class="upload-text">图片裁剪</div>
+                <div class="upload-hint">自定义裁剪区域</div>
             </div>
-            <input type="file" id="fileInput4" accept="image/*" multiple onchange="handleBatch(this.files)">
-            <div class="result-area" id="batchResult">
+            <input type="file" id="fileInput4" accept="image/*" onchange="handleFile(this.files[0], 'crop')">
+            <div class="result-area" id="cropResult">
                 <div class="options">
-                    <div class="option-row"><label>批量压缩质量: <span id="batchQuality" style="color:#00f5d4;font-weight:700;font-size:20px">80</span>%</label><input type="range" id="batchQualitySlider" min="10" max="100" value="80" oninput="document.getElementById('batchQuality').textContent=this.value"></div>
-                    <div class="option-row" style="justify-content:center;gap:15px"><button class="action-btn" onclick="processBatch()">🚀 开始批量处理</button><button class="action-btn green" onclick="downloadBatch()">⬇️ 全部下载</button></div>
+                    <div class="option-row"><label>裁剪区域 (像素):</label></div>
+                    <div class="option-row"><input type="number" id="cropX" placeholder="X" style="width:70px" value="0"> <input type="number" id="cropY" placeholder="Y" style="width:70px" value="0"> <input type="number" id="cropW" placeholder="宽" style="width:70px"> <input type="number" id="cropH" placeholder="高" style="width:70px"> <button class="action-btn" onclick="cropImage()">裁剪</button></div>
                 </div>
-                <div class="file-list" id="fileList"></div>
+                <div class="preview-container"><div class="preview-box"><div class="preview-label">📷 原图</div><img id="cropOriginal" src=""></div><div class="preview-box"><div class="preview-label">✂️ 裁剪后</div><img id="cropResultImg" src=""></div></div>
+                <a class="download-btn" id="cropDownload" download="cropped.png"><span>⬇️</span> 下载</a>
+            </div>
+        </div>
+        
+        <!-- 水印 -->
+        <div id="watermark" class="tab-content">
+            <div class="upload-area" onclick="document.getElementById('watermarkInput').click()">
+                <div class="upload-icon">💧</div>
+                <div class="upload-text">添加文字水印</div>
+                <div class="upload-hint">自定义文字、位置、颜色</div>
+            </div>
+            <input type="file" id="watermarkInput" accept="image/*" onchange="handleFile(this.files[0], 'watermark')">
+            <div class="result-area" id="watermarkResult">
+                <div class="options">
+                    <div class="option-row"><label>水印文字:</label><input type="text" id="watermarkText" value="图片工具箱" oninput="addWatermark()"></div>
+                    <div class="option-row"><label>字体大小:</label><input type="range" id="watermarkSize" min="12" max="100" value="36" oninput="document.getElementById('wmSizeVal').textContent=this.value;addWatermark()"><span id="wmSizeVal" style="color:#00f5d4;margin-left:8px">36</span></div>
+                    <div class="option-row"><label>透明度:</label><input type="range" id="watermarkOpacity" min="0.1" max="1" step="0.1" value="0.5" oninput="document.getElementById('wmOpVal').textContent=this.value;addWatermark()"><span id="wmOpVal" style="color:#00f5d4;margin-left:8px">0.5</span></div>
+                    <div class="option-row"><label>位置:</label><select id="watermarkPos" onchange="addWatermark()"><option value="center">居中</option><option value="bottomRight">右下角</option><option value="bottomLeft">左下角</option><option value="topRight">右上角</option><option value="topLeft">左上角</option></select></div>
+                    <div class="option-row"><label>颜色:</label><input type="color" id="watermarkColor" value="#ffffff" onchange="addWatermark()"></div>
+                </div>
+                <div class="preview-container"><div class="preview-box"><div class="preview-label">📷 原图</div><img id="watermarkOriginal" src=""></div><div class="preview-box"><div class="preview-label">💧 加水印</div><img id="watermarkResultImg" src=""></div></div>
+                <a class="download-btn" id="watermarkDownload" download="watermark.png"><span>⬇️</span> 下载</a>
+            </div>
+        </div>
+        
+        <!-- 旋转 -->
+        <div id="rotate" class="tab-content">
+            <div class="upload-area" onclick="document.getElementById('fileInput5').click()">
+                <div class="upload-icon">🔃</div>
+                <div class="upload-text">旋转/翻转</div>
+                <div class="upload-hint">90°旋转、水平/垂直翻转</div>
+            </div>
+            <input type="file" id="fileInput5" accept="image/*" onchange="handleFile(this.files[0], 'rotate')">
+            <div class="result-area" id="rotateResult">
+                <div class="options">
+                    <div class="option-row" style="justify-content:center;gap:10px">
+                        <button class="action-btn" onclick="rotateImage(-90)">↺ 左转90°</button>
+                        <button class="action-btn" onclick="rotateImage(90)">↻ 右转90°</button>
+                        <button class="action-btn" onclick="flipImage('h')">↔ 水平翻转</button>
+                        <button class="action-btn" onclick="flipImage('v')">↕ 垂直翻转</button>
+                    </div>
+                </div>
+                <div class="preview-container"><div class="preview-box"><div class="preview-label">📷 原图</div><img id="rotateOriginal" src=""></div><div class="preview-box"><div class="preview-label">🔃 效果</div><img id="rotateResultImg" src=""></div></div>
+                <a class="download-btn" id="rotateDownload" download="rotated.png"><span>⬇️</span> 下载</a>
+            </div>
+        </div>
+        
+        <!-- 转PDF -->
+        <div id="pdf" class="tab-content">
+            <div class="upload-area" onclick="document.getElementById('pdfInput').click()">
+                <div class="upload-icon">📑</div>
+                <div class="upload-text">图片转PDF</div>
+                <div class="upload-hint">支持多张图片合并为PDF</div>
+            </div>
+            <input type="file" id="pdfInput" accept="image/*" multiple onchange="handlePdfFiles(this.files)">
+            <div class="result-area" id="pdfResult">
+                <div class="file-list" id="pdfFileList"></div>
+                <button class="action-btn orange" style="display:block;margin:20px auto" onclick="convertToPdf()">📑 转换为PDF</button>
             </div>
         </div>
         
         <div class="features">
-            <div class="feature"><div class="feature-icon">⚡</div><div class="feature-title">本地处理</div><div class="feature-desc">浏览器端处理，保护隐私</div></div>
-            <div class="feature"><div class="feature-icon">🎯</div><div class="feature-title">多功能</div><div class="feature-desc">压缩/转换/缩放/批量</div></div>
-            <div class="feature"><div class="feature-icon">📱</div><div class="feature-title">响应式</div><div class="feature-desc">电脑手机都能用</div></div>
-            <div class="feature"><div class="feature-icon">🆓</div><div class="feature-title">完全免费</div><div class="feature-desc">无需注册无需付费</div></div>
+            <div class="feature"><span class="feature-icon">⚡</span><div class="feature-title">本地处理</div><div class="feature-desc">浏览器端处理</div></div>
+            <div class="feature"><span class="feature-icon">🎯</span><div class="feature-title">7大功能</div><div class="feature-desc">压缩转换裁剪</div></div>
+            <div class="feature"><span class="feature-icon">📱</span><div class="feature-title">响应式</div><div class="feature-desc">电脑手机都能用</div></div>
+            <div class="feature"><span class="feature-icon">🆓</span><div class="feature-title">完全免费</div><div class="feature-desc">无需注册</div></div>
         </div>
-        <p class="tips">🔒 所有处理在浏览器本地完成，不会上传服务器，保护您的隐私</p>
+        <p class="tips">🔒 所有处理在浏览器本地完成</p>
     </div>
+    
     <script>
-        let currentFile = null, currentImg = null, batchFiles = [];
-        function switchTab(tabId, event) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(tabId).classList.add('active'); if(event && event.target) event.target.classList.add('active'); }
-        function handleFile(file, type) { if (!file || !file.type.startsWith('image/')) return; currentFile = file; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { currentImg = img; if (type === 'compress') showCompress(img, file); else if (type === 'convert') showConvert(img, file); else if (type === 'resize') showResize(img, file); }; img.src = e.target.result; }; reader.readAsDataURL(file); }
-        function showCompress(img, file) { document.getElementById('compressResult').style.display = 'block'; document.getElementById('originalImg').src = img.src; document.getElementById('originalInfo').textContent = file.name; document.getElementById('originalSize').textContent = formatSize(file.size); compressImage(img, 0.8); }
-        function updateQuality(val) { document.getElementById('qualityValue').textContent = val; if (currentImg) compressImage(currentImg, val / 100); }
-        function compressImage(img, quality) { const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0); const dataUrl = canvas.toDataURL('image/jpeg', quality); document.getElementById('compressedImg').src = dataUrl; const size = Math.round((dataUrl.length - 22) * 3 / 4); document.getElementById('compressedSize').textContent = formatSize(size); const saved = ((currentFile.size - size) / currentFile.size * 100).toFixed(1); document.getElementById('savedPercent').textContent = saved > 0 ? '-' + saved + '%' : '0%'; document.getElementById('downloadBtn').href = dataUrl; document.getElementById('downloadBtn').download = 'compressed-' + currentFile.name; }
-        function showConvert(img, file) { document.getElementById('convertResult').style.display = 'block'; document.getElementById('convertOriginal').src = img.src; convertImage(); }
-        function convertImage() { if (!currentImg) return; const format = document.getElementById('formatSelect').value; const canvas = document.createElement('canvas'); canvas.width = currentImg.width; canvas.height = currentImg.height; const ctx = canvas.getContext('2d'); ctx.drawImage(currentImg, 0, 0); const ext = format === 'image/jpeg' ? 'jpg' : format === 'image/png' ? 'png' : 'webp'; const dataUrl = canvas.toDataURL(format, 0.9); document.getElementById('convertResultImg').src = dataUrl; document.getElementById('convertDownload').href = dataUrl; document.getElementById('convertDownload').download = 'converted.' + ext; }
-        function showResize(img, file) { document.getElementById('resizeResult').style.display = 'block'; document.getElementById('resizeOriginal').src = img.src; document.getElementById('resizeWidth').value = img.width; document.getElementById('resizeHeight').value = img.height; resizeImage(); }
+        let currentFile = null, currentImg = null;
+        let rotateAngle = 0, flipH = 1, flipV = 1;
+        let pdfFiles = [];
+        
+        function switchTab(tabId, event) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if(event && event.target) event.target.classList.add('active');
+        }
+        
+        function handleFile(file, type) {
+            if (!file || !file.type.startsWith('image/')) return;
+            currentFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    currentImg = img;
+                    if (type === 'compress') showCompress(img, file);
+                    else if (type === 'convert') showConvert(img, file);
+                    else if (type === 'resize') showResize(img, file);
+                    else if (type === 'crop') showCrop(img, file);
+                    else if (type === 'watermark') showWatermark(img, file);
+                    else if (type === 'rotate') showRotate(img, file);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function showCompress(img, file) {
+            document.getElementById('compressResult').style.display = 'block';
+            document.getElementById('originalImg').src = img.src;
+            document.getElementById('originalSize').textContent = formatSize(file.size);
+            compressImage(img, 0.8);
+        }
+        
+        function updateQuality(val) {
+            document.getElementById('qualityValue').textContent = val;
+            if (currentImg) compressImage(currentImg, val / 100);
+        }
+        
+        function compressImage(img, quality) {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+            document.getElementById('compressedImg').src = dataUrl;
+            const size = Math.round((dataUrl.length - 22) * 3 / 4);
+            document.getElementById('compressedSize').textContent = formatSize(size);
+            const saved = ((currentFile.size - size) / currentFile.size * 100).toFixed(1);
+            document.getElementById('savedPercent').textContent = saved > 0 ? '-' + saved + '%' : '0%';
+            document.getElementById('downloadBtn').href = dataUrl;
+        }
+        
+        function showConvert(img, file) {
+            document.getElementById('convertResult').style.display = 'block';
+            document.getElementById('convertOriginal').src = img.src;
+            convertImage();
+        }
+        
+        function convertImage() {
+            if (!currentImg) return;
+            const format = document.getElementById('formatSelect').value;
+            const canvas = document.createElement('canvas');
+            canvas.width = currentImg.width;
+            canvas.height = currentImg.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(currentImg, 0, 0);
+            const ext = format === 'image/jpeg' ? 'jpg' : format === 'image/png' ? 'png' : 'webp';
+            const dataUrl = canvas.toDataURL(format, 0.9);
+            document.getElementById('convertResultImg').src = dataUrl;
+            document.getElementById('convertDownload').href = dataUrl;
+            document.getElementById('convertDownload').download = 'converted.' + ext;
+        }
+        
+        function showResize(img, file) {
+            document.getElementById('resizeResult').style.display = 'block';
+            document.getElementById('resizeOriginal').src = img.src;
+            document.getElementById('resizeWidth').value = img.width;
+            document.getElementById('resizeHeight').value = img.height;
+            resizeImage();
+        }
+        
         function updatePercent(val) { document.getElementById('percentValue').textContent = val; resizeImage(); }
-        document.getElementById('resizeMode').addEventListener('change', function() { const mode = this.value; document.getElementById('percentOption').style.display = mode === 'percent' ? 'flex' : 'none'; document.getElementById('sizeOption').style.display = mode !== 'percent' ? 'flex' : 'none'; });
-        function resizeImage() { if (!currentImg) return; const mode = document.getElementById('resizeMode').value; let w, h; if (mode === 'percent') { const percent = document.getElementById('percentSlider').value / 100; w = Math.round(currentImg.width * percent); h = Math.round(currentImg.height * percent); } else if (mode === 'width') { w = parseInt(document.getElementById('resizeWidth').value) || currentImg.width; h = Math.round(currentImg.height * (w / currentImg.width)); } else if (mode === 'height') { h = parseInt(document.getElementById('resizeHeight').value) || currentImg.height; w = Math.round(currentImg.width * (h / currentImg.height)); } else { w = parseInt(document.getElementById('resizeWidth').value) || currentImg.width; h = parseInt(document.getElementById('resizeHeight').value) || currentImg.height; } const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h; const ctx = canvas.getContext('2d'); ctx.drawImage(currentImg, 0, 0, w, h); const dataUrl = canvas.toDataURL('image/png'); document.getElementById('resizeResultImg').src = dataUrl; document.getElementById('resizeDownload').href = dataUrl; }
-        function handleBatch(files) { batchFiles = Array.from(files); document.getElementById('batchResult').style.display = 'block'; const list = document.getElementById('fileList'); list.innerHTML = batchFiles.map((f, i) => `<div class="file-item"><span>${f.name}</span><span class="size">${formatSize(f.size)}</span></div>`).join(''); }
-        async function processBatch() { const quality = document.getElementById('batchQualitySlider').value / 100; for (let i = 0; i < batchFiles.length; i++) { const file = batchFiles[i]; const reader = new FileReader(); await new Promise(resolve => { reader.onload = async (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0); const dataUrl = canvas.toDataURL('image/jpeg', quality); batchFiles[i].processed = dataUrl; resolve(); }; img.src = e.target.result; }; reader.readAsDataURL(file); }); } alert('✅ 批量处理完成！点击"全部下载"'); }
-        function downloadBatch() { batchFiles.forEach((f, i) => { if (f.processed) { const a = document.createElement('a'); a.href = f.processed; a.download = 'compressed-' + f.name; a.click(); } }); }
-        function formatSize(bytes) { if (bytes < 1024) return bytes + ' B'; if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'; return (bytes / (1024 * 1024)).toFixed(2) + ' MB'; }
-    </script>
-</body>
-</html>
+        
+        document.getElementById('resizeMode').addEventListener('change', function() {
+            document.getElementById('percentOption').style.display = this.value === 'percent' ? 'flex' : 'none';
+            document.getElementById('sizeOption').style.display = this.value !== 'percent' ? 'flex' : 'none';
+        });
+        
+        function resizeImage() {
+            if (!currentImg) return;
+            const mode = document.getElementById('resizeMode').value;
+            let w, h;
+            if (mode === 'percent') {
+                const percent = document.getElementById('percentSlider').value / 100;
+                w = Math.round(currentImg.width * percent);
+                h = Math.round(currentImg.height * percent);
+            } else if (mode === 'width') {
+                w = parseInt(document.getElementById('resizeWidth').value) || currentImg.width;
+                h = Math.round(currentImg.height * (w / currentImg.width));
+            } else {
+                h = parseInt(document.getElementById('resizeHeight').value) || currentImg.height;
+                w = Math.round(currentImg.width * (h / currentImg.height));
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(currentImg, 0, 0, w, h);
+            document.getElementById('resizeResultImg').src = canvas.toDataURL('image/png');
+            document.getElementById('resizeDownload').href = canvas.toDataURL('image/png');
+        }
+        
+        function showCrop(img, file) {
+            document.getElementById('cropResult').style.display = 'block';
+            document.getElementById('cropOriginal').src = img.src;
+            document.getElementById('cropW').value = img.width;
+            document.getElementById('cropH').value = img.height;
+        }
+        
+        function cropImage() {
+            if (!currentImg) return;
+            const x = parseInt(document.getElementById('cropX').value) || 0;
+            const y = parseInt(document.getElementById('cropY').value) || 0;
+            const w = parseInt(document.getElementById('cropW').value) || currentImg.width;
+            const h = parseInt(document.getElementById('cropH').value) || currentImg.height;
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.get
